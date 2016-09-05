@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.niubimq.dao.PCManageDao">
+	<resultMap id="BaseResultMap" type="com.niubimq.pojo.Producer">
+		<id column="iAutoID" property="autoId" jdbcType="INTEGER" />
+		<result column="sProducerSign" property="producerSign" jdbcType="VARCHAR" />
+		<result column="sDesc" property="description" jdbcType="VARCHAR" />
+		<result column="iCreateTime" property="createTime" jdbcType="INTEGER" />
+		<result column="iUpdateTime" property="updateTime" jdbcType="INTEGER" />
+		<result column="iStatus" property="status" jdbcType="INTEGER" />
+	</resultMap>
+
+	<select id="showProducer" resultType="com.niubimq.pojo.Producer" parameterType="java.lang.String">
+		SELECT * FROM mq_db.t_mq_producer t 
+        where t.sProducerSign = #{sProducerSign};
+	</select>
+	
+	<insert id="addProducer" parameterType="com.niubimq.pojo.Producer">
+	     insert into t_mq_producer (sProducerSign,sDesc,iCreateTime,iUpdateTime)
+	     values(
+	     #{producerSign,jdbcType=VARCHAR},
+	     #{description,jdbcType=VARCHAR},
+	     #{createTime,jdbcType=INTEGER},
+	     #{updateTime,jdbcType=INTEGER}
+	     )
+	   
+	</insert>
+
+</mapper>
+
+
+
+
