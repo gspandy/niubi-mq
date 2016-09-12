@@ -11,3 +11,8 @@
   ----------
        http://localhost:8080/nibimq/mqService/deleteProducer.do <br/>
        参数：producerSign  +  description <br/>
+  创建消费者：
+  ----------
+       http://localhost:8080/nibimq/mqService/addConsumer.do <br/>
+       参数：businessSign （必填）  +  description （必填） + callBackUrl（必填）+  <br/>
+             allowRetryTimes (必填) +  responseTimeOut (必填) + requestType(必填) <br/>
