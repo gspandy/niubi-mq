@@ -25,3 +25,7 @@
   删除消费者：
   ----------
        http://localhost:8080/nibimq/mqService/deleteConsumer.do
+  新增消费者 - 生产者 关系：
+  ----------
+       http://localhost:8080/nibimq/mqService/addSubscriber.do
+       参数：businessSign  +  producerSign
