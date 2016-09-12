@@ -1,18 +1,27 @@
 ##接口使用:
   查询生产者：
   ----------
-      http://localhost:8080/nibimq/mqService/showProducer.do <br/>
-      参数：producerSign <br/>
+      http://localhost:8080/nibimq/mqService/showProducer.do 
+      参数：producerSign 
   创建生产者：
   ----------
-       http://localhost:8080/nibimq/mqService/addProducer.do <br/>
-       参数：producerSign  +  description <br/>
+       http://localhost:8080/nibimq/mqService/addProducer.do 
+       参数：producerSign  +  description 
   删除生产者：
   ----------
-       http://localhost:8080/nibimq/mqService/deleteProducer.do <br/>
-       参数：producerSign  +  description <br/>
+       http://localhost:8080/nibimq/mqService/deleteProducer.do 
+       参数：producerSign  +  description 
   创建消费者：
   ----------
-       http://localhost:8080/nibimq/mqService/addConsumer.do <br/>
-       参数：businessSign （必填）  +  description （必填） + callBackUrl（必填）+  <br/>
-             allowRetryTimes (必填) +  responseTimeOut (必填) + requestType(必填) <br/>
+       http://localhost:8080/nibimq/mqService/addConsumer.do 
+       参数：businessSign + description + callBackUrl + allowRetryTimes + responseTimeOut + requestType
+  查询消费者：
+  ----------
+       http://localhost:8080/nibimq/mqService/showConsumer.do  
+  更新消费者：
+  ----------
+       http://localhost:8080/nibimq/mqService/updateConsumer.do
+       参数：businessSign + description + callBackUrl + allowRetryTimes + responseTimeOut + requestType
+  删除消费者：
+  ----------
+       http://localhost:8080/nibimq/mqService/deleteConsumer.do
