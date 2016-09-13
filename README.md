@@ -29,3 +29,11 @@
   ----------
        http://localhost:8080/nibimq/mqService/addSubscriber.do
        参数：businessSign  +  producerSign
+  查询消费者 - 生产者 关系：
+  ----------
+       http://localhost:8080/nibimq/mqService/showSubscriber.do
+       参数：businessSign  +  producerSign
+  删除消费者 - 生产者 关系：
+  ----------
+       http://localhost:8080/nibimq/mqService/deleteSubscriber.do 
+       参数：businessSign  +  producerSign
