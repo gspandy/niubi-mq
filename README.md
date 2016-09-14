@@ -2,7 +2,7 @@
   消息发送：
   ----------
       http://localhost:8080/nibimq/mqService/sendMsg.do
-      参数：producerSign + businessSign + businessSign + planTime + allowRetryTimes
+      参数：producerSign + businessSign + businessSign + allowRetryTimes + planTime （null - 即时发送；有数据 - 定时发送）
   查询生产者：
   ----------
       http://localhost:8080/nibimq/mqService/showProducer.do 
