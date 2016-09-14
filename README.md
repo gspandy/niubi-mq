@@ -1,4 +1,8 @@
 ##接口使用:
+  消息发送：
+  ----------
+      http://localhost:8080/nibimq/mqService/sendMsg.do
+      参数：producerSign + businessSign + businessSign + planTime + allowRetryTimes
   查询生产者：
   ----------
       http://localhost:8080/nibimq/mqService/showProducer.do 
