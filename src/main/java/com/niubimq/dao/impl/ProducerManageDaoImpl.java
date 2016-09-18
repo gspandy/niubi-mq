@@ -14,42 +14,37 @@
  * limitations under the License.
  */
 
-package com.niubimq.dao;
+package com.niubimq.dao.impl;
 
 import java.util.List;
 
+import com.niubimq.dao.BaseDao;
+import com.niubimq.dao.ProducerManageDao;
 import com.niubimq.pojo.Producer;
 
 /**
+ * @Description: 生产者信息使用Dao
  * @author junjin4838
  * @version 1.0
  */
-public interface PCManageDao {
-	
-	/**
-	 * 查询生产者信息
-	 * @param producerSign
-	 * @return List
-	 */
-	public List<Producer> showProducer(String producerSign);
-	
-	/**
-	 * 新增生产者信息
-	 * @param producer
-	 */
-	public void addProducer(Producer producer);
-	
-	/**
-	 * 删除生产者信息
-	 * @param producer
-	 */
-	public void deleteProducer(Producer producer);
-	
-	/**
-	 * 修改生产者信息
-	 * @param producer
-	 */
-	public void updateProducer(Producer producer); 
+public class ProducerManageDaoImpl extends BaseDao implements ProducerManageDao {
 
 
+	public List<Producer> selectProducer(String producerSign) {
+		return sqlSession.selectList("selectProducer", producerSign);
+	}
+
+	public void insertProducer(Producer producer) {
+		if(producer == null) return;
+		sqlSession.insert("insertProducer", producer);
+	}
+
+	public void deleteProducer(Producer producer) {
+		if(producer == null) return;
+		sqlSession.delete("deleteProducer", producer);
+	}
+
+	public void updateProducer(Producer producer) {
+		sqlSession.update("updateProducer",producer);
+	}
 }

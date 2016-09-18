@@ -22,6 +22,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import com.niubimq.listener.LifeCycle;
 import com.niubimq.pojo.Message;
@@ -33,10 +34,10 @@ import com.niubimq.util.PropertiesReader;
  * @author junjin4838
  * @version 1.0
  */
+@Service
 public class ConsumedMsgSaveService extends BaseService {
 
-	private final static Logger log = LoggerFactory
-			.getLogger(ConsumedMsgSaveService.class);
+	private final static Logger log = LoggerFactory.getLogger(ConsumedMsgSaveService.class);
 
 	/**
 	 * 配置文件读取类
@@ -60,7 +61,10 @@ public class ConsumedMsgSaveService extends BaseService {
 				msgList.add(consumedMessageQueue.poll());
 			}
 			
-			msgPushDao.saveConsumedMsg(msgList);
+			//消费完成的数据落地历史库
+			if(msgList.size() != 0){
+				msgPushService.saveConsumedMsg(msgList);
+			}
 
 			// 休眠
 			if (consumedMessageQueue.size() <= 100) {
@@ -87,7 +91,7 @@ public class ConsumedMsgSaveService extends BaseService {
 		consumedMessageQueue = (LinkedBlockingQueue<Message>) queryFactory.getQueue(QueueFactory.CONSUMED_QUEUE);
 
 		// 初始化休眠时间
-		Integer spt = (Integer) reader.get("thread.ConsumedMsgSaveService.sleeptime");
+		Integer spt = Integer.parseInt((String)reader.get("thread.ConsumedMsgSaveService.sleeptime"));
 		this.sleepTime = spt;
 
 		log.info("-------ConsumedMsgSaveService初始化完毕-----");

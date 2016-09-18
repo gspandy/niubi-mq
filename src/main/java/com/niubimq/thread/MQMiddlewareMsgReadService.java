@@ -24,8 +24,9 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import com.niubimq.client.MessageConsumerService;
+import com.niubimq.client.MqClient;
 import com.niubimq.listener.LifeCycle;
 import com.niubimq.pojo.Message;
 import com.niubimq.queue.QueueFactory;
@@ -36,12 +37,13 @@ import com.niubimq.util.PropertiesReader;
  * @author junjin4838
  * @version 1.0
  */
+@Service
 public class MQMiddlewareMsgReadService extends BaseService {
 	
 	private final static Logger log = LoggerFactory.getLogger(MQMiddlewareMsgReadService.class);
 	
 	@Autowired
-	private MessageConsumerService mqClient;
+	private MqClient mqClient;
 
 	/**
 	 * 即时消息队列的引用
@@ -72,7 +74,7 @@ public class MQMiddlewareMsgReadService extends BaseService {
 			if(immediatelyMessageQueue.size() < queueMaxCount){
 				
 				// 从MQ中读取消息
-                String messageStr = mqClient.onMessage();
+                String messageStr = MqClient.receiveMessage();
                 
                 if(StringUtils.isNotEmpty(messageStr)){
                 	
@@ -81,6 +83,8 @@ public class MQMiddlewareMsgReadService extends BaseService {
                 	
                 	//放入队列
                 	immediatelyMessageQueue.add(message);
+                	
+                	System.out.println("immediatelyMessageQueue 即时消费队列的长度： "+ immediatelyMessageQueue.size());
                 	
                 }else{
                 	//MQ中无消息，休眠状态
@@ -119,11 +123,11 @@ public class MQMiddlewareMsgReadService extends BaseService {
 		immediatelyMessageQueue = (LinkedBlockingQueue<Message>) queryFactory.getQueue(QueueFactory.IMMEDIATE_QUEUE);
 
 		// 初始化休眠时间
-		Integer spt = (Integer) reader.get("thread.TimmingMsgConsumeService.sleeptime");
+		Integer spt = Integer.parseInt(reader.get("thread.TimmingMsgConsumeService.sleeptime").toString());
 		this.sleepTime = spt;
 		
 		// 初始化即时消息队列最大值
-        Integer qc = (Integer) reader.get("queue.immediatelyMessageQueue.maxCount");
+        Integer qc = Integer.parseInt((String)reader.get("queue.immediatelyMessageQueue.maxCount"));
         this.queueMaxCount = qc;
         
         log.info("-------MQMiddlewareMsgReadService初始化完毕-----");

@@ -1,12 +1,16 @@
 package com.niubimq.pojo;
 
+import java.io.Serializable;
+
 /**
  * @Description 生产者pojo
  * @author junjin4838
  *
  */
-public class Producer {
+public class Producer implements Serializable{
 	
+	private static final long serialVersionUID = 1L;
+
 	private Integer id;
 	
 	/**

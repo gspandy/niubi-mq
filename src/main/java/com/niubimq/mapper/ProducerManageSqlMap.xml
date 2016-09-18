@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>   
+<!DOCTYPE mapper   
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.niubimq.dao.ProducerManageDao">
+
+	<select id="selectProducer" resultType="com.niubimq.pojo.Producer">
+		SELECT
+			sProducerSign AS producerSign,
+			sDesc AS description,
+			iCreateTime AS createTime,
+			iUpdateTime AS updateTime
+		FROM
+			t_mq_producer
+		WHERE
+			iStatus = '1'
+		<if test="_parameter != null and _parameter != ''">
+			and sProducerSign = #{producerSign，jdbcType=VARCHAR}
+		</if>
+	</select>
+
+	<insert id="insertProducer" parameterType="com.niubimq.pojo.Producer">
+		INSERT into t_mq_producer(
+			sProducerSign,
+			sDesc,
+			iCreateTime,
+			iUpdateTime,
+			iStatus
+			)
+		VALUES(
+			#{producerSign,jdbcType=VARCHAR},
+			#{description,jdbcType=VARCHAR},
+			UNIX_TIMESTAMP(SYSDATE()),
+			UNIX_TIMESTAMP(SYSDATE()),
+			'1'
+			)
+	</insert>
+
+	<update id="deleteProducer" parameterType="com.niubimq.pojo.Producer">
+		update 
+			t_mq_producer
+		set 
+			iStatus = '0',
+			iUpdateTime = UNIX_TIMESTAMP(SYSDATE())
+		where
+			sProducerSign = #{producerSign,jdbcType=VARCHAR}
+	</update>
+
+	<update id="updateProducer" parameterType="com.niubimq.pojo.Producer">
+		update 
+			t_mq_producer
+		set 
+			sDesc = #{description,VARCHAR},
+			iUpdateTime = UNIX_TIMESTAMP(SYSDATE())
+		where
+			sProducerSign = #{producerSign}
+	</update>
+</mapper> 

@@ -22,6 +22,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import com.niubimq.listener.LifeCycle;
 import com.niubimq.pojo.Message;
@@ -37,6 +38,7 @@ import com.niubimq.util.PropertiesReader;
  * @author junjin4838
  * @version 1.0
  */
+@Service
 public class TimmingMsgConsumeService extends BaseService{
 	
 	private static final Logger log = LoggerFactory.getLogger(TimmingMsgConsumeService.class);
@@ -65,17 +67,15 @@ public class TimmingMsgConsumeService extends BaseService{
 		
 		while(this.state == LifeCycle.RUNNING || this.state == LifeCycle.STARTING){
 			
-			log.info("定时消费开始...");
-			
 			//锁定消息数据
-			msgPushDao.lockTimmingMsg(dataLock);
-			List<Message> timmingMsgList = msgPushDao.getTimmingMsg(dataLock);
+			msgPushService.lockTimmingMsg(dataLock);
+			List<Message> timmingMsgList = msgPushService.getTimmingMsg(dataLock);
 			
 			// 放入即时消息队列，等待消费
             immediatelyMessageQueue.addAll(timmingMsgList);
             
             // 从DB中删除
-            msgPushDao.delTimmingMsg(dataLock);
+            msgPushService.delTimmingMsg(dataLock);
             
             try {
 				Thread.sleep(sleepTime);
@@ -98,7 +98,7 @@ public class TimmingMsgConsumeService extends BaseService{
 		QueueFactory queryFactory = QueueFactory.getInstance();
 		immediatelyMessageQueue = (LinkedBlockingQueue<Message>) queryFactory.getQueue(QueueFactory.IMMEDIATE_QUEUE);
 		
-		Integer spt = (Integer) reader.get("thread.TimmingMsgConsumeService.sleeptime");
+		Integer spt = Integer.parseInt((String)reader.get("thread.TimmingMsgConsumeService.sleeptime"));
 		this.sleepTime = spt;
 		
 		Map<String,String> map = System.getenv(); 

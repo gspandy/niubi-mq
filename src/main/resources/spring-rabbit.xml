@@ -24,11 +24,11 @@
     						password="guest"
     						port="5672"/>
     						
-    <rabbit:queue name="niubi_queue" />
+    <rabbit:queue name="test_queue" />
 
 	<rabbit:topic-exchange name="myExchange">
 		<rabbit:bindings>
-			<rabbit:binding queue="niubi_queue" pattern="foo.*" />
+			<rabbit:binding queue="test_queue" pattern="foo.*" />
 		</rabbit:bindings>
 	</rabbit:topic-exchange>
 	

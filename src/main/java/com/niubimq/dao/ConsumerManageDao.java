@@ -14,45 +14,37 @@
  * limitations under the License.
  */
 
-package com.niubimq.dao.impl;
+package com.niubimq.dao;
 
 
 import java.util.List;
-import java.util.Map;
 
-import com.niubimq.dao.BaseDao;
-import com.niubimq.dao.MsgReceiveServiceDao;
 import com.niubimq.pojo.Consumer;
 
 /**
- * @Description: 消息接受服务使用的Dao
+ * 消费者操作管理
  * @author junjin4838
- * @version 1.0
  *
  */
-public class MsgReceiveServiceDaoImpl extends BaseDao implements MsgReceiveServiceDao {
-
-	/**
-	 * 读取所有的consumer
-	 */
-	public List<Consumer> getConsumers() {
-		
-		List<Consumer> consumerList = sqlSession.selectList("getConsumers");
-		return consumerList;
-		
-	}
-
-	/**
-	 * 读取订阅消息
-	 */
-	@SuppressWarnings("rawtypes")
-	public List<Map> getPCMapList() {
-		
-		List<Map> pcMapList = sqlSession.selectList("getPCMapList");
-		return pcMapList;
-		
-	}
-
-   
-
+public interface ConsumerManageDao {
+	
+    /**
+     * 新增消费者信息
+     * */
+    public void insertConsumer(Consumer consumer);
+    
+    /**
+     * 删除消费者信息
+     * */
+    public void deleteConsumer(Consumer c);
+    
+    /**
+     * 修改消费者信息
+     * */
+    public void updateConsumer(Consumer consumer);
+    
+    /**
+     * 查询新增消费者信息
+     * */
+    public List<Consumer> selectConsumer();
 }

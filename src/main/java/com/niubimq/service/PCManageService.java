@@ -7,7 +7,6 @@ import com.niubimq.pojo.Producer;
 /**
  * @Description: 生产者信息管理
  * @author junjin4838
- * @date 2016年8月31日
  * @version 1.0
  */
 public interface PCManageService {

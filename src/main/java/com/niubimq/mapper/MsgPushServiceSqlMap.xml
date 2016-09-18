@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>   
+<!DOCTYPE mapper   
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper  namespace="com.niubimq.dao.MsgPushServiceDao">
+
+	<!-- 查询定时消息 -->
+    <select id="selectTimmingMsg" resultType="com.niubimq.pojo.Message" parameterType="java.lang.String">
+        <![CDATA[
+        SELECT
+			a.sProducerSign AS producerSign,
+			a.sBusinessSign AS businessSign,
+			a.sMessageContent AS messageContent,
+			a.iMessageType AS messageType,
+			a.iPlanTime AS planTime,
+			b.sCallBackUrl AS callBackUrl,
+			b.iAllowRetryTimes AS allowRetryTimes,
+			b.iRequestType AS requestType,
+			b.iResponseTimeOut AS responseTimeOut,
+			0 AS retryTimes
+		FROM
+			t_mq_message_timing a,
+			t_mq_consumer b
+		WHERE
+			a.sBusinessSign = b.sBusinessSign
+		AND b.iStatus = 1
+		AND a.iStatus = 1
+		AND a.iPlanTime <= UNIX_TIMESTAMP(SYSDATE())
+		AND a.sDataLock = #{dataLock,jdbcType=VARCHAR}
+		]]>
+    </select>
+    
+    <!-- 单条保存已消费的消息消息 -->
+    <insert id = "insertConsumedMsg" parameterType="com.niubimq.pojo.Message">
+	    INSERT INTO t_mq_message_his (
+			sProducerSign,
+			sBusinessSign,
+			sMessageContent,
+			sCallBackUrl,
+			iMessageType,
+			iRequestType,
+			iAllowRetryTimes,
+			iConsumeResult,
+			sFailedReason,
+			iPlanTime,
+			iFinishTime,
+			iRetryTimes
+		)
+		VALUES
+			(
+				#{producerSign,jdbcType=VARCHAR},
+				#{businessSign,jdbcType=VARCHAR},
+				#{messageContent,jdbcType=VARCHAR},
+				#{callBackUrl,jdbcType=VARCHAR},
+				#{messageType,jdbcType=INTEGER},
+				#{requestType,jdbcType=INTEGER},
+				#{allowRetryTimes,jdbcType=INTEGER},
+				#{consumeResult,jdbcType=INTEGER},
+				#{failedReason,jdbcType=VARCHAR},
+				#{planTime,jdbcType=INTEGER},
+				UNIX_TIMESTAMP(#{finishTime,jdbcType=INTEGER}),
+				#{retryTimes,jdbcType=INTEGER}
+			)
+    </insert>
+    
+    <!-- 批量保存消费完毕的消息 -->
+    <insert id = "insertConsumedMsgBatch" parameterType="java.util.List">
+	    INSERT INTO t_mq_message_his (
+			sProducerSign,
+			sBusinessSign,
+			sMessageContent,
+			sCallBackUrl,
+			iMessageType,
+			iRequestType,
+			iAllowRetryTimes,
+			iConsumeResult,
+			sFailedReason,
+			iPlanTime,
+			iFinishTime,
+			iRetryTimes
+		) VALUES
+		<foreach collection="list" item="item" index="index" separator="," >  
+        	(#{item.producerSign},
+        	#{item.businessSign},
+        	#{item.messageContent},
+        	#{item.callBackUrl},
+        	#{item.messageType},
+        	#{item.requestType},
+        	#{item.allowRetryTimes},
+        	#{item.consumeResult},
+        	#{item.failedReason},
+        	#{item.planTime},
+        	UNIX_TIMESTAMP(#{item.finishTime}),
+        	#{item.retryTimes})
+	    </foreach> 
+    </insert>
+    
+    <!-- 保存定时消息（单条） -->
+    <insert id = "insertTimmingMsg" parameterType="com.niubimq.pojo.Message">
+	    INSERT INTO t_mq_message_timing (
+			sProducerSign,
+			sBusinessSign,
+			sMessageContent,
+			iMessageType,
+			iPlanTime
+		)
+		VALUES
+			(
+				#{producerSign,jdbcType=VARCHAR},
+				#{businessSign,jdbcType=VARCHAR},
+				#{messageContent,jdbcType=VARCHAR},
+				#{messageType,jdbcType=INTEGER},
+				#{planTime,jdbcType=INTEGER}
+			)
+    </insert>
+    
+    <!-- 保存定时消息（批量） -->
+    <insert id = "insertTimmingMsgBatch" parameterType="com.niubimq.pojo.Message">
+	    INSERT INTO t_mq_message_timing (
+			sProducerSign,
+			sBusinessSign,
+			sMessageContent,
+			iMessageType,
+			iPlanTime
+		)
+		VALUES
+		<foreach collection="list" item="item" index="index" separator="," >  
+        	(#{item.producerSign},
+        	#{item.businessSign},
+        	#{item.messageContent},
+        	#{item.messageType},
+        	#{item.planTime})
+	    </foreach> 
+    </insert>
+    
+    <!-- 锁定时消息 -->
+    <update id="lockTimmingMsg" parameterType="java.lang.String">
+        <![CDATA[
+        UPDATE t_mq_message_timing a SET a.sDataLock = #{dataLock,jdbcType=VARCHAR}
+		WHERE a.iPlanTime <= UNIX_TIMESTAMP(SYSDATE())
+		AND a.sDataLock IS NULL
+		]]>
+    </update>
+    
+    <!-- 删除定时消息 -->
+    <update id="delTimmingMsg" parameterType="java.lang.String">
+        UPDATE  t_mq_message_timing a SET a.iStatus = 0
+        WHERE sDataLock = #{dataLock,jdbcType=VARCHAR}
+    </update>
+</mapper> 

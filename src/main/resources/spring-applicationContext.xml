@@ -28,5 +28,6 @@
 	</bean>
 	<import resource="classpath*:spring-database.xml" />
     <import resource="classpath*:spring-rabbit.xml"/>
+    <import resource="classpath*:mybatis-config.xml"/>
 
 </beans>

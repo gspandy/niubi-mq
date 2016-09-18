@@ -15,16 +15,26 @@ import org.apache.commons.lang.StringUtils;
 
 import com.niubimq.pojo.Message;
 
+/**
+ * æ¶ˆæ¯å·¥å…·ç±»
+ *
+ */
 public class MessageSender {
     
     /**
-     * ·¢ËÍÏûÏ¢¸øÏû·ÑÕß
+     * å‘é€æ¶ˆæ¯ç»™æ¶ˆè´¹è€…
      * @throws Exception 
      * 
      * */
     public static Socket sendMessageBySocket(Message msg) throws Exception{
+    	
+    	int startIndex = msg.getCallBackUrl().indexOf("://") + 3;
+    	
+    	int endIndex = msg.getCallBackUrl().indexOf("/", msg.getCallBackUrl().indexOf("://")+3);
+    	
+    	String url = msg.getCallBackUrl().substring(startIndex, endIndex);
         
-        InetAddress inetAddress = InetAddress.getByName(msg.getCallBackUrl().substring(msg.getCallBackUrl().indexOf("://")+3, msg.getCallBackUrl().indexOf("/", msg.getCallBackUrl().indexOf("://")+3)));
+        InetAddress inetAddress = InetAddress.getByName(url);
         String IP = inetAddress.getHostAddress();
         String hostName = inetAddress.getHostName();
         int port = 80;
@@ -67,9 +77,9 @@ public class MessageSender {
     }
     
     /**
-     * ½âÎöÏìÓ¦Êı¾İÎªhashmap
+     * è§£æå“åº”æ•°æ®ä¸ºHashMap
      *    
-     * @return resultMap consumeResult :success-Ïû·Ñ³É¹¦£»failed-Ïû·ÑÊ§°Ü
+     * @return resultMap consumeResult :success-æ¶ˆè´¹æˆåŠŸ failed-æ¶ˆæ¯å¤±è´¥
      * @throws IOException 
      * 
      * */
@@ -82,7 +92,7 @@ public class MessageSender {
         String tempStr;
         while(count < 2){
             if(!reader.ready()) {
-                failedReason = "ÏìÓ¦ÄÚÈİ²»ºÏ·¨";
+                failedReason = "å“åº”å†…å®¹ä¸åˆæ³•";
                 break;
             }
             tempStr = reader.readLine();
@@ -103,4 +113,5 @@ public class MessageSender {
         resultMap.put("failedReason", failedReason);
         return resultMap;
     }
+    
 }

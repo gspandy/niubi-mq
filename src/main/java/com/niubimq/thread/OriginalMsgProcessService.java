@@ -23,19 +23,18 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.proxy.InvocationHandler;
-import org.springframework.cglib.proxy.Proxy;
+import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.web.context.ContextLoader;
+import org.springframework.web.context.WebApplicationContext;
 
-import com.niubimq.client.MessageProductorService;
-import com.niubimq.dao.DaoProxy;
-import com.niubimq.dao.MsgReceiveServiceDao;
-import com.niubimq.dao.impl.MsgReceiveServiceDaoImpl;
+import com.niubimq.client.MqClient;
 import com.niubimq.listener.LifeCycle;
 import com.niubimq.pojo.Consumer;
 import com.niubimq.pojo.Message;
 import com.niubimq.queue.QueueFactory;
+import com.niubimq.service.MsgReceiveService;
+import com.niubimq.util.MessageBackup;
 import com.niubimq.util.PropertiesReader;
 
 /**
@@ -43,12 +42,11 @@ import com.niubimq.util.PropertiesReader;
  * @author junjin4838
  * @version 1.0
  */
+@Service
 public class OriginalMsgProcessService extends BaseService {
 
 	private static final Logger log = LoggerFactory.getLogger(OriginalMsgProcessService.class);
 	
-	@Autowired
-	private MessageProductorService messageProductorService;
 
 	/**
 	 * 配置文件读取类
@@ -73,7 +71,7 @@ public class OriginalMsgProcessService extends BaseService {
 	/**
 	 * 所有消费者
 	 */
-	private static HashMap<String, Consumer> consumerMap;
+	public static HashMap<String, Consumer> consumerMap;
 
 	/**
 	 * 休眠时间
@@ -94,11 +92,11 @@ public class OriginalMsgProcessService extends BaseService {
 				if(msg.getPlanTime() == null){
 					//使用消息中间件
 					try{
-						messageProductorService.pushAllMsgQueue(p2pMsgList);
+						MqClient.pushAllMsgQueue(p2pMsgList);
 					}catch(Exception e){
 						log.error(e.getMessage());
 						//将消息备份
-						
+						MessageBackup.msgList2File(p2pMsgList);
 					}
 				}else{
 					//定时消息
@@ -108,6 +106,7 @@ public class OriginalMsgProcessService extends BaseService {
 				try {
 					Thread.sleep(sleepTime);
 				} catch (InterruptedException e) {
+					log.error(e.getMessage());
 					e.printStackTrace();
 				}
 			}
@@ -195,7 +194,7 @@ public class OriginalMsgProcessService extends BaseService {
 		timmingMessageQueue = (LinkedBlockingQueue<Message>) queryFactory.getQueue(QueueFactory.TIMMING_QUEUE);
 
 		// 休眠时间
-		Integer spt = (Integer) reader.get("thread.OriginalMsgProcessService.sleeptime");
+		Integer spt = Integer.parseInt((String)reader.get("thread.OriginalMsgProcessService.sleeptime"));
 		sleepTime = spt;
 
 		// 初始化P-C map数据
@@ -236,22 +235,25 @@ public class OriginalMsgProcessService extends BaseService {
 	/**
 	 * 初始化P-C
 	 * 
-	 * pcMap (key:生产者标识，value:生产者标识的数据) consumerMap (key:消费者标识，value:消费者对象)
+	 * pcMap (key:生产者标识，value:生产者标识的数据) 
+	 * 
+	 * consumerMap (key:消费者标识，value:消费者对象)
+	 * 
+	 * 
 	 */
-	public static void initPCMapData() {
+	public void initPCMapData() {
 
-		// 初始化Dao
-		DaoProxy daoHandler = new DaoProxy(new MsgReceiveServiceDaoImpl());
+        //从servletContext中获取相应的bean文件
+		WebApplicationContext webApplicationContext = ContextLoader.getCurrentWebApplicationContext(); 
+		MsgReceiveService msgReceiveService = (MsgReceiveService) webApplicationContext.getBean("msgReceiveService");
 
-		MsgReceiveServiceDao productDao = (MsgReceiveServiceDao) Proxy
-				.newProxyInstance(
-						MsgReceiveServiceDaoImpl.class.getClassLoader(),
-						MsgReceiveServiceDaoImpl.class.getInterfaces(),
-						(InvocationHandler) daoHandler);
+		//生产者 - 消费者的对应关系
+		pcMap = msgReceiveService.getPCMapList();
+		
+		System.out.println(pcMap);
 
-		pcMap = productDao.getPCMapList();
-
-		consumerMap = productDao.getConsumers();
+		//获得所有消费者信息
+		consumerMap = msgReceiveService.getConsumers();
 
 	}
 

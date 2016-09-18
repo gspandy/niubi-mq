@@ -14,32 +14,42 @@
  * limitations under the License.
  */
 
-package com.niubimq.dao;
+package com.niubimq.dao.impl;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.niubimq.pojo.Consumer;
+import com.niubimq.dao.BaseDao;
+import com.niubimq.dao.PCMapManageDao;
 
 /**
- * @Description: 
+ * @Description: 订阅信息管理 
  * @author junjin4838
  * @version 1.0
  */
-public interface MsgReceiveServiceDao {
-	
+public class PCManageDaoImpl extends BaseDao implements PCMapManageDao{
+
+    /**
+     * 展示生成者-消费者 映射关系
+     */
+	public List<Map<String, String>> selectPCMap(Map<String, String> pcMap) {
+		return sqlSession.selectList("selectPCMap", pcMap);
+	}
+
+
 	/**
-	 * 读取所有消费者
+	 * 删除生成者-消费者 映射关系
 	 */
-	public List<Consumer> getConsumers();
-	
+	public void deletePCMap(Map<String, String> pcMap) {
+		sqlSession.update("deletePCMap", pcMap);
+	}
+
+
 	/**
-	 * 读取所有订阅消息
-	 * @return HashMap<String,String[]>
+	 * 添加生产者-消费者 映射关系
 	 */
-	public List<Map> getPCMapList();
-	
-	
+	public void insertPCMap(Map<String, String> pcMap) {
+		sqlSession.update("insertPCMap", pcMap);
+	}
 
 }

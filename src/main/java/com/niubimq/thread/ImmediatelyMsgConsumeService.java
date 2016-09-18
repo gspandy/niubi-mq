@@ -9,6 +9,7 @@ import net.sf.json.JSONObject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import com.niubimq.listener.LifeCycle;
 import com.niubimq.pojo.Message;
@@ -26,6 +27,7 @@ import com.niubimq.util.PropertiesReader;
  * @author junjin4838
  * @version 1.0
  */
+@Service
 public class ImmediatelyMsgConsumeService extends BaseService {
 	
 	private final static Logger log = LoggerFactory.getLogger(ImmediatelyMsgConsumeService.class);
@@ -100,7 +102,12 @@ public class ImmediatelyMsgConsumeService extends BaseService {
 			}catch(Exception e){
 			   // 消费异常
 			   if(msg.getAllowRetryTimes() > msg.getRetryTimes()){
-				   
+				   //允许重试，将消息放入即时消费队列等待再次消费
+				   msg.setRetryTimes(msg.getRetryTimes()+1);
+				   msg.setConsumeResult(2);
+				   msg.setFinishTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+				   msg.setFailedReason(e.getMessage());
+				   immediateMessageQueue.add(msg);
 			   }else{
 				  // 重试结束
 				  msg.setConsumeResult(2);
@@ -137,17 +144,17 @@ public class ImmediatelyMsgConsumeService extends BaseService {
 		consumingMessageQueue = (LinkedBlockingQueue<MessageWrapper>)queryFactory.getQueue(QueueFactory.CONSUMING_QUEUE);
 		
 		// 初始化休眠时间
-		Integer spt = (Integer) reader.get("thread.ImmediatelyMsgConsumeService.sleeptime");
+		Integer spt = Integer.parseInt((String)reader.get("thread.ImmediatelyMsgConsumeService.sleeptime"));
 		this.sleepTime = spt;
 		
 		// 初始化全局响应超时时间
-        Integer mrt = (Integer)reader.get("message.responseTimeOut");
+        Integer mrt = Integer.parseInt(reader.get("message.responseTimeOut").toString());
         if(mrt != null){
             this.msgResponseTimeout = mrt;
         }
         
         // 初始化consumingMsgQueueMaxCount
-        Integer cmmt = (Integer)reader.get("queue.consumingMessageQueue.maxCount");
+        Integer cmmt = Integer.parseInt(reader.get("queue.consumingMessageQueue.maxCount").toString());
         if(mrt != null){
             this.consumingMsgQueueMaCount = cmmt;
         }

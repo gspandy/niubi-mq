@@ -6,6 +6,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import com.niubimq.listener.LifeCycle;
 import com.niubimq.pojo.Message;
@@ -17,6 +18,7 @@ import com.niubimq.util.PropertiesReader;
  * @author junjin4838
  * @version 1.0
  */
+@Service
 public class TimmingMsgSaveService extends BaseService {
 	
 	private static final Logger log = LoggerFactory.getLogger(TimmingMsgSaveService.class);
@@ -39,16 +41,21 @@ public class TimmingMsgSaveService extends BaseService {
 	public void run() {
 		
 		while(this.state == LifeCycle.RUNNING || this.state == LifeCycle.STARTING){
+			
 			//批量入库
 			List<Message> msgList = new ArrayList<Message>();
 			
 			for(int i=0;i<100 && timmingMessageQueue.size() !=0 ;i++){
+				//测试的时候，关注是否重复添加了数据 = ~ = 
+				System.out.println("队列发出数据： " + timmingMessageQueue.poll());
 				msgList.add(timmingMessageQueue.poll());
 			}
 			
-			msgPushDao.saveTimmingMsg(msgList);
+			if(msgList.size() != 0){
+				msgPushService.saveTimmingMsg(msgList);
+			}
 			
-			//休息
+			//队列什么时候进入休眠，可以按照既定的业务去判别，这边没有做严格的控制，其实还是来一条数据就即时的保存一条数据到DB
 			if(timmingMessageQueue.size() <= 100){
 				try {
 					Thread.sleep(sleepTime);
@@ -70,7 +77,7 @@ public class TimmingMsgSaveService extends BaseService {
 	    QueueFactory queryFactory = QueueFactory.getInstance();
 	    timmingMessageQueue = (LinkedBlockingQueue<Message>) queryFactory.getQueue(QueueFactory.TIMMING_QUEUE);
 	    
-	    Integer spt = (Integer) reader.get("thread.TimmingMsgConsumeService.sleeptime");
+	    int spt = Integer.parseInt((String) reader.get("thread.TimmingMsgConsumeService.sleeptime"));
 		this.sleepTime = spt;
 		
 		log.info("-----TimmingMsgSaveService初始化完毕----");

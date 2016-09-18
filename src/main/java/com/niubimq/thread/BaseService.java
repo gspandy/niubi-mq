@@ -17,11 +17,12 @@
 package com.niubimq.thread;
 
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.ContextLoader;
+import org.springframework.web.context.WebApplicationContext;
 
-import com.niubimq.dao.MsgPushDao;
 import com.niubimq.listener.LifeCycle;
+import com.niubimq.service.MsgPushService;
 
 /**
  * @Description: 服务基类
@@ -31,8 +32,10 @@ import com.niubimq.listener.LifeCycle;
 @Service
 public abstract class BaseService implements LifeCycle,Runnable {
 	
-	@Autowired
-	public MsgPushDao msgPushDao;
+	/**
+	 * 消息保存服务
+	 */
+	public MsgPushService msgPushService;
 	
 	/**
 	 * 服务当前的状态
@@ -50,6 +53,11 @@ public abstract class BaseService implements LifeCycle,Runnable {
 	 * 服务初始化
 	 */
 	public final void init() {
+		
+		//初始化相关Service
+		WebApplicationContext webApplicationContext = ContextLoader.getCurrentWebApplicationContext(); 
+		msgPushService = (MsgPushService) webApplicationContext.getBean("msgPushService");
+		
 		initInternal();
 		this.state = LifeCycle.INITIALIZED;
 		setStateInternal(this.state);

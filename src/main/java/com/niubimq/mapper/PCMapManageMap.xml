@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>   
+<!DOCTYPE mapper   
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.niubimq.dao.PCMapManageDao">
+
+	<select id="selectPCMap" resultType="java.util.HashMap" parameterType="java.util.HashMap">
+		SELECT
+			sProducerSign AS producerSign,
+			sBusinessSign AS businessSign
+		FROM
+			t_mq_pc_map
+		WHERE istatus = '1'
+		<if test="producerSign != null and producerSign != ''">
+			and sProducerSign = #{producerSign}
+		</if>
+		<if test="businessSign != null and businessSign != ''">
+			and sBusinessSign = #{businessSign}
+		</if>
+	</select>
+
+	<insert id="insertPCMap" parameterType="java.util.HashMap">
+		INSERT into t_mq_pc_map(
+			sProducerSign,
+			sBusinessSign,
+			iCreateTime,
+			iUpdateTime,
+			istatus
+			)
+		VALUES(
+			#{producerSign,jdbcType=VARCHAR},
+			#{businessSign,jdbcType=VARCHAR},
+			UNIX_TIMESTAMP(SYSDATE()),
+			UNIX_TIMESTAMP(SYSDATE()),
+			'1'
+			)
+	</insert>
+
+	<update id="deletePCMap" parameterType="java.util.HashMap">
+		update 
+			t_mq_pc_map
+		set 
+			istatus = '0',
+			iUpdateTime = UNIX_TIMESTAMP(SYSDATE())
+		where 1=1
+		<if test="producerSign != null and producerSign != ''">
+			and sProducerSign = #{producerSign}
+		</if>
+		<if test="businessSign != null and businessSign != ''">
+			and sBusinessSign = #{businessSign}
+		</if>
+	</update>
+</mapper> 

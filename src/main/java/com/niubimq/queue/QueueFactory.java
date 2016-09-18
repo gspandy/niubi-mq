@@ -18,7 +18,6 @@ import com.niubimq.pojo.MessageWrapper;
 /**
  * @Description: </p>
  * @author junjin4838
- * @date 2016年8月31日
  * @version 1.0
  */
 public class QueueFactory implements DynamicMBean {

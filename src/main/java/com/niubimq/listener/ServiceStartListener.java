@@ -1,3 +1,19 @@
+/*
+ * Copyright 2002-2016 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.niubimq.listener;
 
 import javax.servlet.ServletContextEvent;
@@ -30,6 +46,9 @@ public class ServiceStartListener implements ServletContextListener {
 	 */
 	private PropertiesReader reader = PropertiesReader.getInstance();
 	
+	/**
+	 * 推送消息标识
+	 */
 	public boolean useMessagePushService = true;
 
 	/**
@@ -49,16 +68,16 @@ public class ServiceStartListener implements ServletContextListener {
 	public void contextInitialized(ServletContextEvent arg0) {
 		
 		if(reader.get("service.msgReciveService.useMsgPushService") != null){
-			useMessagePushService = (Boolean)reader.get("service.msgReciveService.useMsgPushService");
+			useMessagePushService = Boolean.parseBoolean(((String) reader.get("service.msgReciveService.useMsgPushService")));
 		}
 		
 		if(useMessagePushService) Bootstrap.init();
-		timmingMsgSaveService.init();
-		originalMsgProcessService.init();
+			timmingMsgSaveService.init();
+			originalMsgProcessService.init();
 		
 		if(useMessagePushService) Bootstrap.start();
-		timmingMsgSaveService.start();
-		originalMsgProcessService.start();
+			timmingMsgSaveService.start();
+			originalMsgProcessService.start();
 		
 	}
 	

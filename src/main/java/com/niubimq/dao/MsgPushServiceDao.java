@@ -21,32 +21,32 @@ import java.util.List;
 import com.niubimq.pojo.Message;
 
 
-public interface MsgPushDao {
+public interface MsgPushServiceDao {
 
     /**
      * 保存消费过的数据（单条保存）
      * */
-    public void saveConsumedMsg(Message msg);
+    public void insertConsumedMsg(Message msg);
     
     /**
      * 保存消费过的数据（批量保存）
      * */
-    public void saveConsumedMsg(List<Message> msgList);
+    public void insertConsumedMsgBatch(List<Message> msgList);
     
     /**
      * 保存定时消息数据（单条保存）
      * */
-    public void saveTimmingMsg(Message msg);
+    public void insertTimmingMsg(Message msg);
     
     /**
      * 保存定时消息数据（批量保存）
      * */
-    public void saveTimmingMsg(List<Message> msgList);
+    public void insertTimmingMsgBatch(List<Message> msgList);
     
     /**
      * 获取定时消息数据
      * */
-    public List<Message> getTimmingMsg(String dataLock);
+    public List<Message> selectTimmingMsg(String dataLock);
     
     /**
      * 锁定消息数据

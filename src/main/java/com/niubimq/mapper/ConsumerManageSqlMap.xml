@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>   
+<!DOCTYPE mapper   
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.niubimq.dao.ConsumerManageDao">
+
+	<select id="selectConsumer" resultType="com.niubimq.pojo.Consumer">
+		SELECT
+			sBusinessSign AS businessSign,
+			sDesc AS description,
+			sCallBackUrl AS callBackUrl,
+			iAllowRetryTimes AS allowRetryTimes,
+			iResponseTimeOut AS responseTimeOut,
+			iRequestType AS requestType,
+			iCreateTime AS createTime,
+			iUpdateTime AS updateTime
+		FROM
+			t_mq_consumer
+		WHERE
+			istatus = '1'
+	</select>
+
+	<insert id="insertConsumer" parameterType="com.niubimq.pojo.Consumer">
+		INSERT into t_mq_consumer(
+			sBusinessSign,
+			sDesc,
+			sCallBackUrl,
+			iAllowRetryTimes,
+			iResponseTimeOut,
+			iRequestType,
+			iCreateTime,
+			iUpdateTime,
+			istatus
+			)
+		VALUES(
+			#{businessSign,jdbcType=VARCHAR},
+			#{description,jdbcType=VARCHAR},
+			#{callBackUrl,jdbcType=VARCHAR},
+			#{allowRetryTimes,jdbcType=INTEGER},
+			#{responseTimeOut,jdbcType=INTEGER},
+			#{requestType,jdbcType=INTEGER},
+			UNIX_TIMESTAMP(SYSDATE()),
+			UNIX_TIMESTAMP(SYSDATE()),
+			'1'
+			)
+	</insert>
+
+	<update id="deleteConsumer" parameterType="com.niubimq.pojo.Consumer">
+		update t_mq_consumer set iStatus = '0' AND iUpdateTime = UNIX_TIMESTAMP(SYSDATE())
+		where sBusinessSign = #{businessSign}
+	</update>
+
+	<update id="updateConsumer" parameterType="com.niubimq.pojo.Consumer">
+		update 
+			t_mq_consumer
+		set 
+			sBusinessSign = #{businessSign},
+			sDesc = #{description},
+			sCallBackUrl = #{callBackUrl},
+			iAllowRetryTimes = #{allowRetryTimes},
+			iResponseTimeOut = #{responseTimeOut},
+			iRequestType = #{requestType},
+			iUpdateTime = UNIX_TIMESTAMP(SYSDATE())
+		where
+			iStatus = '1'
+			and sBusinessSign = #{businessSign}
+	</update>
+</mapper> 

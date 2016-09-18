@@ -12,6 +12,7 @@ import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import com.niubimq.listener.LifeCycle;
 import com.niubimq.pojo.Message;
@@ -25,6 +26,7 @@ import com.niubimq.util.PropertiesReader;
  * @author junjin4838
  * @version 1.0
  */
+@Service
 public class ConsumingMsgProcessService extends BaseService{
 	
 	private final static Logger log = LoggerFactory.getLogger(ImmediatelyMsgConsumeService.class);
@@ -35,12 +37,12 @@ public class ConsumingMsgProcessService extends BaseService{
 	private PropertiesReader reader = PropertiesReader.getInstance();
 
     /**
-     * Queue1 : 即时消息队列的引用
+     * Queue2 : 即时消息队列的引用
      */
 	private LinkedBlockingQueue<Message> immediatelyMessageQueue;
 	
 	/**
-	 * Queue2 : 包含连接对象的消息队列引用
+	 * Queue3 : 包含连接对象的消息队列引用
 	 */
 	private LinkedBlockingQueue<MessageWrapper> consumingMessageQueue;
 	
@@ -56,8 +58,9 @@ public class ConsumingMsgProcessService extends BaseService{
 	
 	public void run() {
 		
-		
 		while(this.state == LifeCycle.RUNNING || this.state == LifeCycle.STARTING){
+			
+			//System.out.println("消息消费的过程队列 --" + consumingMessageQueue.size());
 			
 			MessageWrapper msgWrapper = consumingMessageQueue.poll();
 			
@@ -156,7 +159,7 @@ public class ConsumingMsgProcessService extends BaseService{
 	    consumedMessageQueue = (LinkedBlockingQueue<Message>)queryFactory.getQueue(QueueFactory.CONSUMED_QUEUE);
 	    
 	    // 初始化休眠时间
-	 	Integer spt = (Integer) reader.get("thread.ConsumingMsgProcessService.sleeptime");
+	 	Integer spt =Integer.parseInt((String)reader.get("thread.ConsumingMsgProcessService.sleeptime"));
 	 	this.sleepTimes = spt;
 	 	
 	 	log.info("-----------ConsumingMsgProcessService初始化完毕-------");
